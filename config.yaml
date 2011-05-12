@@ -1,0 +1,7 @@
+:db:
+    adapter: jdbcmysql
+    database: time_assistant
+    pool: 10
+    timeout: 5000
+    username: root
+:verbose: false
