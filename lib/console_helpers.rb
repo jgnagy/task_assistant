@@ -1,15 +1,19 @@
 # Custom methods to be used as helpers in the irb console
+
+# all console helper methods should have a description here, like this:
+#  :method        => ["Description of method", "method required_params, [optional params] - usage info"]
 @options = {
-  :help           => "Displays this output",
-  :start          => "Starts a new task in the open workspace", 
-  :switch         => "Switches to an existing (or new) task",
-  :save           => "Saves the current workspace to a file",
-  :resume         => "Alias for :switch",
-  :task_list      => "Displays tasks for the current workspace",
-  :tag            => "Tags the current task",
-  :note           => "Adds a note to the current task",
-  :spent          => "Allows you to specify how long you spent on this task",
-  :report         => "Generates a report of the last weeks tasks"
+  :help           => ["Displays this output", "help [:command] - display help info, optionally for a specific command"],
+  :start          => ["Starts a new task in the open workspace", "start - starts a new task"], 
+  :switch         => ["Switches to an existing (or new) task", "switch [task_id] - switches to a new, or optionally existing, task"],
+  :save           => ["Saves the current workspace to a file", "save [task_id] - save the current, or an optional other, task"],
+  :resume         => ["Alias for :switch", "resume [task_id] - this is an alias for the `switch` command"],
+  :task_list      => ["Displays tasks for the current workspace", "task_list - shows all known tasks (might display a lot of data)"],
+  :tag            => ["Tags the current task", "tag <\"list of tags\"> - tags the current task with all tags in the string (comma or space separated)"],
+  :note           => ["Adds a note to the current task", "note <\"a note\"> - adds a note to the current task"],
+  :spent          => ["Allows you to specify how long you spent on this task", "spent <time> - pass an integer (for minutes) or a string in the form of \"/^[0-9]+[MmHhSs]$/\" \n\t\tto say how long you worked on the current task"],
+  :report         => ["Generates a report of the last weeks tasks", "CURRENTLY NOT IMPLEMENTED!"],
+  :reconcile      => ["Marks a task as being saved into a larger system (JIRA or SAGE)", "reconcile [task_id] - sets the boolean value of 'reconciled?' to true for the current, or optionally specific, task"]
 }
 
 @current_task = nil
@@ -127,8 +131,12 @@ def spent(time, options = {})
 end
 
 def help(command = nil)
-  @options.each do |k,v|
-    puts "\t#{k}: #{v}"
+  if command
+    puts "#{@options[command] ? @options[command][1] : 'commands must be symbols to get help...\':symbol\''}"
+  else
+    @options.each do |k,v|
+      puts "\t#{k}: #{v[0]}"
+    end
   end
   return false
 end
