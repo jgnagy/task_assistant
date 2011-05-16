@@ -58,8 +58,9 @@ def save(task_id = nil)
   end
 end
 
-def task_list
+def task_list(num = false)
   tasks = Task.where("created_at >= #{Date.today - 7}").order("created_at DESC")
+  tasks = tasks.limit(num) if num
   tasks.each do |t|
     puts "Task: #{t.id}"
     puts "  started @ #{t.created_at}"
