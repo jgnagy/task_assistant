@@ -131,6 +131,38 @@ def spent(time, options = {})
   end
 end
 
+def report(options = {})
+  report_period = nil
+  if options[:since]
+    report_period = Time.parse(options[:since])
+  else
+    if Time.now.day < 7
+      report_period = (60 * 60 * 24 * (Time.now.day - 1)) + (60 * 60 * Time.now.hour) + (60 * Time.now.min)
+    else
+      report_period = (60 * 60 * 24 * 7)
+    end
+  end
+  report_start = Time.now - report_period
+  if options[:tag]
+    tasks_to_report = Tag.find_by_name(options[:tag]).tasks.where('created_at >= ?', report_start)
+  else
+    tasks_to_report = Task.where('created_at >= ?', report_start)
+  end
+  if options[:format]
+    puts tasks_to_report.send("to_#{options[:format]}")
+  else
+    flog "Tasks since #{report_start}"
+    tasks_to_report.each do |t|
+      puts "Task: #{t.id}"
+      puts "  started @ #{t.created_at}"
+      puts "  time spent: #{t.time_spent / 60} minutes" if t.time_spent
+      puts t.tags ? "  tags: #{t.tags.collect {|tag| tag.name}.join(', ')}" : "  tags: "
+      puts t.details ? "  notes: \n\t#{t.details.collect {|d| "(#{d[1].to_s}) #{d[0]}"}.join("\n\t")}" : "  notes: "
+    end
+    flog "End of report"
+  end
+end
+
 def help(command = nil)
   if command
     puts "#{@options[command] ? @options[command][1] : 'commands must be symbols to get help...\':symbol\''}"
